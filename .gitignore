@@ -1,0 +1,16 @@
+# IDE Settings
+.vs/
+.vscode/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environments
+venv/
+env/
+
+# Data sets (Too large for GitHub, not needed for Render production)
+data/
+notebook/

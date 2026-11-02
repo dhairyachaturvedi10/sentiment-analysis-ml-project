@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentimentAI | ML Product Review Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Phosphor Icons for UI polish -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <i class="ph ph-brain"></i> Sentiment<span>AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="https://github.com" target="_blank"><i class="ph ph-github-logo"></i> View Source</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <div class="hero">
+            <h1>Automated Sentiment Analysis</h1>
+            <p>A machine learning pipeline that classifies e-commerce product reviews into positive or negative sentiments using Natural Language Processing.</p>
+        </div>
+
+        <div class="app-grid">
+            <!-- Left Column: The Analyzer -->
+            <div class="card">
+                <h3><i class="ph ph-text-aa"></i> Text Analyzer</h3>
+                <textarea id="reviewText" placeholder="Paste a product review here... (e.g., 'The build quality is excellent, highly recommended!')"></textarea>
+                <button class="btn-primary" onclick="analyzeSentiment()" id="analyzeBtn">Analyze Sentiment</button>
+                
+                <div id="result">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i id="resultIcon" class="ph"></i>
+                        <span id="sentimentLabel"></span>
+                    </div>
+                    <span id="confidenceLabel"></span>
+                </div>
+            </div>
+
+            <!-- Right Column: Model Specs (Great for Academic Projects) -->
+            <div class="card">
+                <h3><i class="ph ph-cpu"></i> System Architecture</h3>
+                <ul class="specs-list">
+                    <li>
+                        <span class="spec-label">Algorithm</span>
+                        <span class="spec-value">Multinomial Naive Bayes</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Feature Extraction</span>
+                        <span class="spec-value">TF-IDF Vectorization</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Vocabulary Size</span>
+                        <span class="spec-value">10,000 Words</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Preprocessing</span>
+                        <span class="spec-value">Regex & NLTK Stopwords</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Dataset</span>
+                        <span class="spec-value">Amazon Fine Food Reviews</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        Machine Learning Mini Project &bull; Built with Python, Flask, and Scikit-Learn
+    </footer>
+
+    <script>
+        async function analyzeSentiment() {
+            const text = document.getElementById('reviewText').value;
+            const resultDiv = document.getElementById('result');
+            const sentimentLabel = document.getElementById('sentimentLabel');
+            const confidenceLabel = document.getElementById('confidenceLabel');
+            const resultIcon = document.getElementById('resultIcon');
+            const btn = document.getElementById('analyzeBtn');
+            
+            if (!text.trim()) return;
+            
+            btn.textContent = 'Processing via API...';
+            btn.style.opacity = '0.7';
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ review: text })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.style.display = 'flex';
+                resultDiv.className = ''; 
+                
+                if (data.sentiment === 'Positive') {
+                    resultDiv.classList.add('positive');
+                    resultIcon.className = 'ph ph-check-circle';
+                } else {
+                    resultDiv.classList.add('negative');
+                    resultIcon.className = 'ph ph-warning-circle';
+                }
+                
+                sentimentLabel.textContent = data.sentiment;
+                confidenceLabel.textContent = `${data.confidence}% Confidence`;
+                
+            } catch (error) {
+                alert("Error connecting to the model API.");
+            } finally {
+                btn.textContent = 'Analyze Sentiment';
+                btn.style.opacity = '1';
+            }
+        }
+    </script>
+</body>
+</html>
